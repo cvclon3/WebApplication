@@ -29,8 +29,8 @@ int main(int argc , char *argv[])
 	fd_set readfds;
 
 	//a message
-	char *message = "HTTP/1.1 200 OK \r\n\r\n"
-                    "Hello";
+	char *message = "HTTP/1.1 200 OK \r\n\r\n";
+                    //"Hello";
 
 	//initialise all client_socket[] to 0 so not checked
 	for (i = 0; i < max_clients; i++)
