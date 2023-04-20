@@ -1,5 +1,6 @@
 #include <iostream>
 #include <fstream>
+#include "stdio.h"
 using namespace std;
 int main() {
     string myText;
@@ -16,6 +17,24 @@ int main() {
 // Close the file
     MyReadFile.close();
 
+    FILE * fp;
+    char * line = NULL;
+    size_t len = 0;
+    ssize_t read;
+
+    fp = fopen("../data/file.txt", "r");
+    if (fp == NULL) {
+        printf("EERRRR");
+        exit(EXIT_FAILURE);
+    }
+
+    while ((read = getline(&line, &len, fp)) != -1) {
+        //send(sd, line, strlen(line), 0);
+        printf("Retrieved line of length %zu:\n", read);
+        printf("%s", line);
+    }
+
+    fclose(fp);
     return 0;
 
 }
