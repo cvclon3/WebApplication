@@ -105,7 +105,7 @@ int main(int argc , char *argv[])
 		//wait for an activity on one of the sockets , timeout is NULL ,
 		//so wait indefinitely
         struct timeval tv;
-        tv.tv_sec = 3;
+        tv.tv_sec = 10;
         tv.tv_usec = 0;
 		activity = select( max_sd + 1 , &readfds , NULL , NULL , &tv);
 
@@ -180,6 +180,28 @@ int main(int argc , char *argv[])
                     valread = read(sd, buffer, 2048);
 
                     send(sd, message, strlen(message), 0);
+
+                    send(sd, message, strlen(message), 0);
+
+                    FILE * fp;
+                    char * line = NULL;
+                    size_t len = 0;
+                    ssize_t read;
+
+                    fp = fopen("../data/file.txt", "r");
+                    if (fp == NULL) {
+                        printf("EERRRR");
+                        exit(EXIT_FAILURE);
+                    }
+
+                    while ((read = getline(&line, &len, fp)) != -1) {
+                        send(sd, line, strlen(line), 0);
+                        //printf("Retrieved line of length %zu:\n", read);
+                        //printf("%s", line);
+                    }
+
+                    fclose(fp);
+
                     //Somebody disconnected , get his details and print
                     getpeername(sd, (struct sockaddr *) &address, \
                     (socklen_t *) &addrlen);
