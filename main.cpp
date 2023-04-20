@@ -181,7 +181,7 @@ int main(int argc , char *argv[])
 
                     send(sd, message, strlen(message), 0);
 
-                    send(sd, message, strlen(message), 0);
+                    //send(sd, message, strlen(message), 0);
 
                     FILE * fp;
                     char * line = NULL;
