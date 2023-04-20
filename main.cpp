@@ -105,7 +105,7 @@ int main(int argc , char *argv[])
 		//wait for an activity on one of the sockets , timeout is NULL ,
 		//so wait indefinitely
         struct timeval tv;
-        tv.tv_sec = 5;
+        tv.tv_sec = 3;
         tv.tv_usec = 0;
 		activity = select( max_sd + 1 , &readfds , NULL , NULL , &tv);
 
@@ -177,7 +177,7 @@ int main(int argc , char *argv[])
 
                     //Check if it was for closing , and also read the
                     //incoming message
-                    valread = read(sd, buffer, 1024);
+                    valread = read(sd, buffer, 2048);
 
                     send(sd, message, strlen(message), 0);
                     //Somebody disconnected , get his details and print
