@@ -17,6 +17,8 @@
 
 int main(int argc , char *argv[])
 {
+    //INIT MASTER SOCKET
+    //region init
 	int opt = TRUE;
 	int master_socket , addrlen , new_socket , client_socket[30] ,
 		max_clients = 30 , activity, i , valread , sd;
@@ -77,7 +79,7 @@ int main(int argc , char *argv[])
 	//accept the incoming connection
 	addrlen = sizeof(address);
 	puts("Waiting for connections ...");
-
+    //endregion
 	while(TRUE)
 	{
 		//clear the socket set
@@ -126,19 +128,11 @@ int main(int argc , char *argv[])
 			}
 
 
-
 			//inform user of socket number - used in send and receive commands
 			printf("New connection , socket fd is %d , ip is : %s , port : %d\
 				\n" , new_socket , inet_ntoa(address.sin_addr) , ntohs
 				(address.sin_port));
 
-			//send new connection greeting message
-			/*if( send(new_socket, message, strlen(message), 0) != strlen(message) )
-			{
-				perror("send");
-			}
-
-			puts("Welcome message sent successfully");*/
 
 			//add new socket to array of sockets
 			for (i = 0; i < max_clients; i++)
@@ -169,7 +163,7 @@ int main(int argc , char *argv[])
                 close(sd);
                 client_socket[i] = 0;
                 printf("%d", max_sd);
-                break;
+                //break;
             } else {
                 printf("%d\n", activity);
                 if (FD_ISSET(sd, &readfds)) {
@@ -211,17 +205,6 @@ int main(int argc , char *argv[])
                     //Close the socket and mark as 0 in list for reuse
                     close(sd);
                     client_socket[i] = 0;
-                    /*
-
-                    //Echo back the message that came in
-                    else
-                    {
-                        //set the string terminating NULL byte on the end
-                        //of the data read
-                        buffer[valread] = '\0';
-                        send(sd , buffer , strlen(buffer) , 0 );
-                        close(sd);
-                    }*/
                 }
             }
 		}

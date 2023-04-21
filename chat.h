@@ -9,11 +9,11 @@
 
 using namespace std;
 
-class chat {
-public:
-    void hi() {
-        cout << "HELLO\n";
-    }
+class message {
+    int sender;
+    int receiver;
+    char* message;
+
 };
 
 
