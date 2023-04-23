@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+
+    <style>
+        #message {
+            resize: none;
+        }
+    </style>
+</head>
+<body>
+<h2>Set connection</h2>
+<div>
+    <input type="hidden" id="chatID" />
+    <p>
+        Sender:<br/>
+        <input id="senderID" />
+    </p>
+    <p>
+        Receiver:<br />
+        <input id="receiverID" />
+    </p>
+    <p>
+        <button id="startPolling">Start</button>
+    </p>
+</div>
+
+<h2>Chat</h2>
+<div>
+    <input type="hidden" id="messageID" />
+    <textarea id="message" resize="None" maxlength="48"></textarea>
+
+    <br>
+
+    <button id="sendMessage">send</button>
+</div>
+<table>
+    <thead><tr><th></th><th></th><th></th></tr></thead>
+    <tbody>
+    </tbody>
+</table>
+
+<script>
+    //SMART INTERVAL
+    function SmartInterval(asyncFn, delayMs) {
+        this.asyncFn = asyncFn;
+        this.delayMs = delayMs;
+
+        this.running = false;
+    }
+
+    SmartInterval.prototype.cycle = async function (forced) {
+        await this.asyncFn();
+        await this.delay(this.delayMs);
+        if (!forced && this.running) this.cycle();
+    };
+
+    SmartInterval.prototype.start = function () {
+        if (this.running) return;
+        this.running = true;
+        this.cycle();
+    };
+
+    SmartInterval.prototype.delay = function (ms) {
+        return new Promise(res =>
+            setTimeout(() => res(1), ms)
+        );
+    };
+
+    SmartInterval.prototype.delay = function (ms) {
+        return new Promise(res =>
+            setTimeout(() => res(1), ms)
+        );
+    };
+    //<----- ----->
+
+
+
+    async function getUpdate(chat) {
+
+        const response = await fetch("/polling", {
+            method: "GET",
+            headers: { "Accept": "application/json" },
+            body: JSON.stringify(chat)
+        });
+
+        if (response.ok == true) {
+            const answer = await response.json()
+
+        } else {
+            console.log("Error: GET Update")
+        }
+
+    }
+
+    async function getHistory(chat) {
+
+        chat.value = "history"
+
+        const response = await fetch("/history", {
+            method: "GET",
+            headers: { "Accept": "application/json" },
+            body: JSON.stringify(chat)
+        });
+
+        if (response.ok == true) {
+            const answer = await response.json()
+            document.querySelector("tbody").append(row(answer))
+        } else {
+            console.log("Error: GET Hidtory")
+        }
+    }
+
+    async function send(message) {
+
+        const response = await fetch("/send", {
+            method: "POST",
+            headers: { "Accept": "application/json" },
+            body: JSON.stringify(message)
+        });
+
+        if (response.ok == true) {
+            const answer = await response.json()
+            document.querySelector("tbody").append(row(answer))
+        } else {
+            console.log("Error: POST Message")
+        }
+    }
+
+    function row(message) {
+
+        const tr = document.createElement("tr");
+        //tr.setAttribute("data-rowid", user.id);
+
+        const senderTd = document.createElement("td");
+        senderTd.append(message.sender);
+        tr.append(senderTd);
+
+        const messageTd = document.createElement("td");
+        messageTd.append(message.message);
+        tr.append(messageTd);
+
+        return tr;
+    }
+
+
+
+    document.getElementById("startPolling").addEventListener("click", async() => {
+
+        const chat = {
+            value: "polling",
+            sender: document.getElementById("senderID").value,
+            receiver: document.getElementById("receiverID").value,
+        }
+
+        let polling = new SmartInterval(
+            async() => { getUpdate(chat) },
+            500
+        )
+
+        polling.start()
+    })
+
+    document.getElementById("sendMessage").addEventListener("click", async() => {
+
+        const message = {
+            sender: document.getElementById("senderID").value,
+            message: document.getElementById("message").value
+        }
+
+        await send(message)
+
+    })
+</script>
+</body>
+</html>

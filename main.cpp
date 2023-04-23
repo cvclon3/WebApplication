@@ -11,6 +11,12 @@
 #include <netinet/in.h>
 #include <sys/time.h> //FD_SET, FD_ISSET, FD_ZERO macros
 
+#include <fstream>
+#include <iostream>
+//#include <string>
+#include <string.h>
+#include "parse.h"
+
 #define TRUE 1
 #define FALSE 0
 #define PORT 26000
@@ -25,7 +31,7 @@ int main(int argc , char *argv[])
 	int max_sd;
 	struct sockaddr_in address;
 
-	char buffer[1025]; //data buffer of 1K
+	char buffer[2049]; //data buffer of 1K
 
 	//set of socket descriptors
 	fd_set readfds;
@@ -107,7 +113,7 @@ int main(int argc , char *argv[])
 		//wait for an activity on one of the sockets , timeout is NULL ,
 		//so wait indefinitely
         struct timeval tv;
-        tv.tv_sec = 10;
+        tv.tv_sec = 5;
         tv.tv_usec = 0;
 		activity = select( max_sd + 1 , &readfds , NULL , NULL , &tv);
 
@@ -162,12 +168,12 @@ int main(int argc , char *argv[])
                 //Close the socket and mark as 0 in list for reuse
                 close(sd);
                 client_socket[i] = 0;
-                printf("%d", max_sd);
+                //printf("%d", max_sd);
                 //break;
             } else {
                 printf("%d\n", activity);
                 if (FD_ISSET(sd, &readfds)) {
-                    printf("Work");
+                    printf("Work\n");
 
                     //Check if it was for closing , and also read the
                     //incoming message
@@ -175,26 +181,46 @@ int main(int argc , char *argv[])
 
                     send(sd, message, strlen(message), 0);
 
+                    string buf = buffer;
+
+                    struct request req = parse_start_line(buf);
+
+                    if (req.target == "/") {
+                        FILE * fp;
+                        char * line = NULL;
+                        size_t len = 0;
+                        ssize_t read;
+
+                        fp = fopen("../data/file.html", "r");
+                        if (fp == NULL) {
+                            printf("EERRRR");
+                            exit(EXIT_FAILURE);
+                        }
+
+                        while ((read = getline(&line, &len, fp)) != -1) {
+                            send(sd, line, strlen(line), 0);
+                            //printf("Retrieved line of length %zu:\n", read);
+                            //printf("%s", line);
+                        }
+
+                        fclose(fp);
+                    }
+                    if (req.target == "/send") {
+                        send(sd, message, strlen(message), 0);
+                        char* answer = "sender: ALA\r\n"
+                                       "message: AAAAAA";
+                        send(sd, answer, strlen(answer), 0);
+                    }
+
+                    /*std::fstream file;
+                    file.open("../client/get.txt", std::fstream::out);
+                    file.write(buffer, strlen(buffer));
+                    file.close();*/
                     //send(sd, message, strlen(message), 0);
 
-                    FILE * fp;
-                    char * line = NULL;
-                    size_t len = 0;
-                    ssize_t read;
 
-                    fp = fopen("../data/file.txt", "r");
-                    if (fp == NULL) {
-                        printf("EERRRR");
-                        exit(EXIT_FAILURE);
-                    }
 
-                    while ((read = getline(&line, &len, fp)) != -1) {
-                        send(sd, line, strlen(line), 0);
-                        //printf("Retrieved line of length %zu:\n", read);
-                        //printf("%s", line);
-                    }
-
-                    fclose(fp);
+                    //send(sd, buffer, strlen(buffer), 0);
 
                     //Somebody disconnected , get his details and print
                     getpeername(sd, (struct sockaddr *) &address, \

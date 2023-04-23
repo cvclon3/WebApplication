@@ -3,4 +3,4 @@ project(WebApplication1)
 
 set(CMAKE_CXX_STANDARD 17)
 
-add_executable(WebApplication1 main.cpp chat.cpp chat.h)
+add_executable(WebApplication1 main.cpp message.cpp message.h parse.cpp parse.h)

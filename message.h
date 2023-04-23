@@ -2,10 +2,11 @@
 // Created by mercury on 4/20/23.
 //
 #pragma once
-#ifndef WEBAPPLICATION1_CHAT_H
-#define WEBAPPLICATION1_CHAT_H
+#ifndef WEBAPPLICATION1_MESSAGE_H
+#define WEBAPPLICATION1_MESSAGE_H
 
 #include <iostream>
+#include <ctime>
 
 using namespace std;
 
@@ -17,4 +18,4 @@ class message {
 };
 
 
-#endif //WEBAPPLICATION1_CHAT_H
+#endif //WEBAPPLICATION1_MESSAGE_H
