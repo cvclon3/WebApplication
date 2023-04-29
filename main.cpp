@@ -112,9 +112,12 @@ int main(int argc , char *argv[])
 
 		//wait for an activity on one of the sockets , timeout is NULL ,
 		//so wait indefinitely
+
+        //set 180 seconds for select
         struct timeval tv;
-        tv.tv_sec = 5;
+        tv.tv_sec = 180;
         tv.tv_usec = 0;
+
 		activity = select( max_sd + 1 , &readfds , NULL , NULL , &tv);
 
 		if ((activity < 0) && (errno!=EINTR))
@@ -179,19 +182,21 @@ int main(int argc , char *argv[])
                     //incoming message
                     valread = read(sd, buffer, 2048);
 
-                    send(sd, message, strlen(message), 0);
+                    //send(sd, message, strlen(message), 0);
 
                     string buf = buffer;
 
                     struct request req = parse_start_line(buf);
 
                     if (req.target == "/") {
+                        send(sd, message, strlen(message), 0);
+
                         FILE * fp;
                         char * line = NULL;
                         size_t len = 0;
                         ssize_t read;
 
-                        fp = fopen("../data/file.html", "r");
+                        fp = fopen("../data/index.html", "r");
                         if (fp == NULL) {
                             printf("EERRRR");
                             exit(EXIT_FAILURE);
@@ -207,20 +212,15 @@ int main(int argc , char *argv[])
                     }
                     if (req.target == "/send") {
                         send(sd, message, strlen(message), 0);
-                        char* answer = "sender: ALA\r\n"
-                                       "message: AAAAAA";
+                        cout << buffer;
+                        //send(sd, message, strlen(message), 0);
+                        char* answer = "{\"sender\": \"ALA\",\r\n"
+                                       "\"message\": \"AAAAAA\"}";
                         send(sd, answer, strlen(answer), 0);
                     }
-
-                    /*std::fstream file;
-                    file.open("../client/get.txt", std::fstream::out);
-                    file.write(buffer, strlen(buffer));
-                    file.close();*/
-                    //send(sd, message, strlen(message), 0);
-
-
-
-                    //send(sd, buffer, strlen(buffer), 0);
+                    if (req.target == "/polling") {
+                        send(sd, message, strlen(message), 0);
+                    }
 
                     //Somebody disconnected , get his details and print
                     getpeername(sd, (struct sockaddr *) &address, \
