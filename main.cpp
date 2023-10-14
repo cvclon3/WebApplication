@@ -220,6 +220,7 @@ int main(int argc , char *argv[])
                     }
                     if (req.target == "/polling") {
                         send(sd, message, strlen(message), 0);
+
                     }
 
                     //Somebody disconnected , get his details and print

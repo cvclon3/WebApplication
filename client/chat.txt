@@ -1,1 +1,11 @@
-sender: message
+LAST_LINE
+status;sender;message
+
+15
+<read/unre>;<username>;<message>
+<read/unre>;<username>;<message>
+<read/unre>;<username>;<message>
+<read/unre>;<username>;<message>
+<read/unre>;<username>;<message>
+<read/unre>;<username>;<message>
+<read/unre>;<username>;<message>
